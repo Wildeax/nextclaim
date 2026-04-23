@@ -1,0 +1,10 @@
+node_modules/
+dist/
+data/
+logs/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+free-games-claimer/data/
+free-games-claimer/node_modules/

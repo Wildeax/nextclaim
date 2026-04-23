@@ -1,0 +1,22 @@
+{
+  "name": "auto-claimer",
+  "version": "0.1.0",
+  "description": "Friendly Electron wrapper for vogler/free-games-claimer",
+  "main": "ui/main.js",
+  "type": "module",
+  "scripts": {
+    "start": "electron .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^25.0.0",
+    "vitest": "^2.0.0"
+  },
+  "dependencies": {
+    "electron-store": "^10.0.0",
+    "node-cron": "^3.0.3"
+  }
+}
