@@ -24,6 +24,7 @@ export function createScheduler({ store, runClaim }) {
   }
 
   function runOnLaunchIfStale() {
+    if (!store.get('firstRunCompleted')) return;
     if (store.get('paused')) return;
     if (!store.isStale()) return;
     setTimeout(() => runClaim('on-launch-catchup'), 30_000);
