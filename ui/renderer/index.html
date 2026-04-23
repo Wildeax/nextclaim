@@ -44,7 +44,10 @@
       <section class="panel log-panel">
         <div class="panel-head">
           <span class="panel-title">Live log</span>
-          <button id="clear-log" class="btn btn-ghost btn-sm">Clear</button>
+          <div style="display:flex;gap:4px">
+            <button id="copy-log" class="btn btn-ghost btn-sm">Copy</button>
+            <button id="clear-log" class="btn btn-ghost btn-sm">Clear</button>
+          </div>
         </div>
         <pre id="log-content"></pre>
       </section>

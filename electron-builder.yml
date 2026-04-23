@@ -17,8 +17,8 @@ extraResources:
       - "**/*"
       - "!.git*"
       - "!data/**"
-  - from: "C:/Users/GAMER/AppData/Local/ms-playwright/firefox-1482"
-    to: playwright-browsers/firefox-1482
+  - from: "C:/Users/GAMER/AppData/Local/ms-playwright/chromium-1169"
+    to: playwright-browsers/chromium-1169
 win:
   target: zip
   icon: assets/app-icon.ico

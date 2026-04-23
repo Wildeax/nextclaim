@@ -56,7 +56,12 @@ function cardFor(s) {
           <button class="btn btn-secondary skip-btn" data-store="${s.id}">Skip</button>
         </div>
       </div>
-      <pre class="card-log"></pre>
+      <div class="card-log-wrap" style="display:none;margin-top:10px">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:4px">
+          <button type="button" class="btn btn-ghost btn-sm card-copy">Copy</button>
+        </div>
+        <pre class="card-log" style="margin:0"></pre>
+      </div>
     </div>`;
 }
 
@@ -67,11 +72,22 @@ function wireCard(s) {
   const status = card.querySelector('.store-status');
   const log = card.querySelector('.card-log');
 
+  const logWrap = card.querySelector('.card-log-wrap');
+  const copyBtn = card.querySelector('.card-copy');
+  copyBtn.addEventListener('click', async () => {
+    const text = log.textContent;
+    if (!text.trim()) return;
+    await navigator.clipboard.writeText(text);
+    const original = copyBtn.textContent;
+    copyBtn.textContent = 'Copied';
+    setTimeout(() => { copyBtn.textContent = original; }, 1200);
+  });
+
   loginBtn.addEventListener('click', async () => {
     loginBtn.disabled = true;
     skipBtn.disabled = true;
     loginBtn.textContent = 'Opening browser…';
-    log.style.display = 'block'; log.textContent = '';
+    logWrap.style.display = 'block'; log.textContent = '';
     const lineHandler = ({ store, line }) => {
       if (store === s.id) { log.textContent += line + '\n'; log.scrollTop = log.scrollHeight; }
     };

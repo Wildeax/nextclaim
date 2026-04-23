@@ -178,4 +178,14 @@ document.getElementById('claim-now').addEventListener('click', async () => {
 
 document.getElementById('clear-log').addEventListener('click', clearLog);
 
+document.getElementById('copy-log').addEventListener('click', async () => {
+  const btn = document.getElementById('copy-log');
+  const text = document.getElementById('log-content').textContent;
+  if (!text.trim()) return;
+  await navigator.clipboard.writeText(text);
+  const original = btn.textContent;
+  btn.textContent = 'Copied';
+  setTimeout(() => { btn.textContent = original; }, 1200);
+});
+
 init();

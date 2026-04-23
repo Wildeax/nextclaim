@@ -272,11 +272,9 @@ button { font-family: inherit; }
   font-family: Consolas, monospace;
   font-size: 11px;
   padding: 8px 12px;
-  margin: 10px 0 0;
   max-height: 80px;
   overflow: auto;
   border-radius: 2px;
-  display: none;
   white-space: pre-wrap;
   word-break: break-word;
 }

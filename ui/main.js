@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, Notification } from 'electron';
+import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, Notification, screen } from 'electron';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { readFileSync, existsSync } from 'node:fs';
@@ -101,8 +101,21 @@ function specFor(storeName, { show }) {
     SCREENSHOTS_DIR: join(FGC_DATA_DIR, 'screenshots'),
   };
   if (show) {
-    env.WIDTH = '1280';
-    env.HEIGHT = '800';
+    // Cap viewport so the login form fits on common laptop displays (1366x768 / 1536x864).
+    // Using 1366x720 keeps the Chromium window under 800px tall including chrome.
+    env.WIDTH = '1366';
+    env.HEIGHT = '720';
+    // Default 180s is too short when waiting for an email verification code.
+    env.LOGIN_TIMEOUT = '600';
+  } else {
+    // Non-interactive scheduled run: Epic still forces a visible Chromium (upstream dev branch
+    // hardcodes headless:false because hCaptcha detects headless mode). Position off-screen +
+    // start minimized so it runs invisibly for the user. Works on any monitor size.
+    const primary = screen.getPrimaryDisplay();
+    const offscreenX = primary.bounds.x + primary.bounds.width + 100;
+    env.WINDOW_POS_X = String(offscreenX);
+    env.WINDOW_POS_Y = '0';
+    env.WINDOW_MINIMIZED = '1';
   }
   if (PLAYWRIGHT_BROWSERS_PATH) env.PLAYWRIGHT_BROWSERS_PATH = PLAYWRIGHT_BROWSERS_PATH;
   return {
