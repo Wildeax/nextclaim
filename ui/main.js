@@ -202,6 +202,7 @@ ipcMain.handle('complete-first-run', () => {
 });
 
 app.whenReady().then(() => {
+  Menu.setApplicationMenu(null);
   createWindow();
   createTray();
   setAutostart(store.get('autostartOnLogin'));
