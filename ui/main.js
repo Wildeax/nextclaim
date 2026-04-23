@@ -10,14 +10,23 @@ import { setAutostart } from './autostart.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
-const FGC_DIR = join(ROOT, 'free-games-claimer');
+
+const PORTABLE_DATA_ROOT = process.env.PORTABLE_EXECUTABLE_DIR
+  ? join(process.env.PORTABLE_EXECUTABLE_DIR, 'data')
+  : join(ROOT, 'portable-data');
+const FGC_DIR = process.env.PORTABLE_EXECUTABLE_DIR
+  ? join(process.resourcesPath, 'free-games-claimer')
+  : join(ROOT, 'free-games-claimer');
+const FGC_DATA_DIR = process.env.PORTABLE_EXECUTABLE_DIR
+  ? join(PORTABLE_DATA_ROOT, 'fgc')
+  : join(FGC_DIR, 'data');
 
 const SCRIPT_FOR = { epic: 'epic-games', prime: 'prime-gaming', gog: 'gog' };
 const ERROR_CLASSES = new Set(['login_expired', 'captcha', 'linking_needed', 'crash']);
 
 let win = null;
 let tray = null;
-const store = createStore();
+const store = createStore({ cwd: PORTABLE_DATA_ROOT });
 const runner = createRunner();
 let scheduler = null;
 
@@ -84,7 +93,12 @@ function specFor(storeName, { show }) {
     cmd: process.execPath,
     args: [`${SCRIPT_FOR[storeName]}.js`],
     cwd: FGC_DIR,
-    env: { ELECTRON_RUN_AS_NODE: '1', SHOW: show ? '1' : '0' },
+    env: {
+      ELECTRON_RUN_AS_NODE: '1',
+      SHOW: show ? '1' : '0',
+      BROWSER_DIR: join(FGC_DATA_DIR, 'browser'),
+      SCREENSHOTS_DIR: join(FGC_DATA_DIR, 'screenshots'),
+    },
   };
 }
 
@@ -129,9 +143,9 @@ ipcMain.handle('get-status', () => ({
 
 ipcMain.handle('get-history', () => {
   const FILES = {
-    epic: join(FGC_DIR, 'data', 'epic-games.json'),
-    prime: join(FGC_DIR, 'data', 'prime-gaming.json'),
-    gog: join(FGC_DIR, 'data', 'gog.json'),
+    epic: join(FGC_DATA_DIR, 'epic-games.json'),
+    prime: join(FGC_DATA_DIR, 'prime-gaming.json'),
+    gog: join(FGC_DATA_DIR, 'gog.json'),
   };
   const rows = [];
   for (const [storeName, path] of Object.entries(FILES)) {
