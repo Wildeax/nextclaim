@@ -1,0 +1,3 @@
+[submodule "free-games-claimer"]
+	path = free-games-claimer
+	url = https://github.com/Wildeax/free-games-claimer-for-non-programmers.git
