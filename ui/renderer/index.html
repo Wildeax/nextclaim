@@ -2,24 +2,53 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Auto Claimer</title>
+  <title>NextClaim</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="welcome" class="hidden"></div>
-  <div id="dashboard">
-    <section id="status-panel"><h2>Status</h2><div id="status-content">Loading…</div></section>
-    <section id="actions-panel">
-      <h2>Actions</h2>
-      <button id="claim-now">Claim Now</button>
-      <div id="login-buttons">
-        <button data-store="epic">Log in to Epic</button>
-        <button data-store="prime">Log in to Prime Gaming</button>
-        <button data-store="gog">Log in to GOG</button>
+  <div id="dashboard" class="hidden">
+    <header class="app-header">
+      <img class="app-logo" src="../../assets/isotipo.png" alt="NextClaim" />
+      <div class="app-title">
+        <h1>NextClaim</h1>
+        <div class="app-subtitle" id="header-subtitle">Loading…</div>
       </div>
-    </section>
-    <section id="history-panel"><h2>History</h2><div id="history-content">Loading…</div></section>
-    <section id="log-panel"><h2>Live log</h2><pre id="log-content"></pre></section>
+      <div class="header-actions">
+        <button id="claim-now" class="btn btn-primary">
+          <span class="btn-icon">▶</span>
+          <span>Claim now</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="panel">
+        <div class="panel-head">
+          <span class="panel-title">Stores</span>
+          <span class="panel-sub" id="stores-sub"></span>
+        </div>
+        <div id="store-cards" class="store-grid"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <span class="panel-title">Recent claims</span>
+          <span class="panel-sub" id="history-sub"></span>
+        </div>
+        <div id="history-content" class="history-list">
+          <div class="empty">No games claimed yet.</div>
+        </div>
+      </section>
+
+      <section class="panel log-panel">
+        <div class="panel-head">
+          <span class="panel-title">Live log</span>
+          <button id="clear-log" class="btn btn-ghost btn-sm">Clear</button>
+        </div>
+        <pre id="log-content"></pre>
+      </section>
+    </main>
   </div>
   <script type="module" src="renderer.js"></script>
 </body>

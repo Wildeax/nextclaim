@@ -1,7 +1,7 @@
 {
-  "name": "auto-claimer",
+  "name": "nextclaim",
   "version": "0.1.0",
-  "description": "Friendly Electron wrapper for vogler/free-games-claimer",
+  "description": "NextClaim — auto-claims daily free games on Epic, Prime Gaming, and GOG",
   "main": "ui/main.js",
   "type": "module",
   "scripts": {
@@ -10,6 +10,7 @@
     "test:watch": "vitest",
     "build": "electron-builder --win"
   },
+  "author": "Wildeax",
   "devDependencies": {
     "electron": "^32.0.0",
     "electron-builder": "^25.0.0",

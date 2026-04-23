@@ -27,13 +27,19 @@ let scheduler = null;
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 720,
-    height: 560,
+    width: 880,
+    height: 640,
+    minWidth: 720,
+    minHeight: 560,
     show: false,
+    backgroundColor: '#10131a',
+    icon: join(ROOT, 'assets', 'app-icon.ico'),
+    title: 'NextClaim',
     webPreferences: {
-      preload: join(__dirname, 'preload.js'),
+      preload: join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
+      sandbox: false,
     },
   });
   win.loadFile(join(__dirname, 'renderer', 'index.html'));
@@ -47,7 +53,7 @@ function createWindow() {
 
 function setTrayIcon(variant) {
   if (!tray) return;
-  const file = variant === 'error' ? 'tray-icon-error.ico' : 'tray-icon.ico';
+  const file = variant === 'error' ? 'isotipo-error.ico' : 'isotipo.ico';
   tray.setImage(nativeImage.createFromPath(join(ROOT, 'assets', file)));
 }
 
@@ -73,9 +79,9 @@ function rebuildTrayMenu() {
 }
 
 function createTray() {
-  const icon = nativeImage.createFromPath(join(ROOT, 'assets', 'tray-icon.ico'));
+  const icon = nativeImage.createFromPath(join(ROOT, 'assets', 'isotipo.ico'));
   tray = new Tray(icon);
-  tray.setToolTip('Auto Claimer');
+  tray.setToolTip('NextClaim');
   tray.on('click', () => {
     if (win.isVisible()) win.hide();
     else win.show();

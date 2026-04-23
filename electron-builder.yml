@@ -1,5 +1,5 @@
-appId: com.moodstudios.autoclaimer
-productName: Auto Claimer
+appId: com.wildeax.nextclaim
+productName: NextClaim
 directories:
   output: dist
 files:
@@ -21,5 +21,5 @@ extraResources:
     to: playwright-browsers/firefox-1482
 win:
   target: zip
-  icon: assets/installer-icon.ico
-  artifactName: AutoClaimer-${version}.zip
+  icon: assets/app-icon.ico
+  artifactName: NextClaim-${version}.zip

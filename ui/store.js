@@ -14,7 +14,7 @@ const STALE_MS = 18 * 3600 * 1000;
 
 export function createStore({ cwd } = {}) {
   const store = new Store({
-    name: 'auto-claimer',
+    name: 'nextclaim',
     cwd,
     defaults: DEFAULTS,
   });
