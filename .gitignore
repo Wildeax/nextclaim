@@ -8,3 +8,6 @@ Thumbs.db
 .vscode/
 free-games-claimer/data/
 free-games-claimer/node_modules/
+coverage/
+.idea/
+.env*
