@@ -11,5 +11,5 @@ free-games-claimer/node_modules/
 coverage/
 .idea/
 .env*
-.claude/settings.local.json
+.claude/
 portable-data/
