@@ -100,6 +100,10 @@ function specFor(storeName, { show }) {
     BROWSER_DIR: join(FGC_DATA_DIR, 'browser'),
     SCREENSHOTS_DIR: join(FGC_DATA_DIR, 'screenshots'),
   };
+  if (show) {
+    env.WIDTH = '1280';
+    env.HEIGHT = '800';
+  }
   if (PLAYWRIGHT_BROWSERS_PATH) env.PLAYWRIGHT_BROWSERS_PATH = PLAYWRIGHT_BROWSERS_PATH;
   return {
     cmd: process.execPath,
