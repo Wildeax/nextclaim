@@ -1,20 +1,25 @@
-import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage } from 'electron';
+import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, Notification } from 'electron';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { readFileSync, existsSync } from 'node:fs';
 import { createStore } from './store.js';
 import { createRunner } from './runner.js';
+import { notifyError, notifyDailySummary } from './notifier.js';
+import { createScheduler } from './scheduler.js';
+import { setAutostart } from './autostart.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const FGC_DIR = join(ROOT, 'free-games-claimer');
 
 const SCRIPT_FOR = { epic: 'epic-games', prime: 'prime-gaming', gog: 'gog' };
+const ERROR_CLASSES = new Set(['login_expired', 'captcha', 'linking_needed', 'crash']);
 
 let win = null;
 let tray = null;
 const store = createStore();
 const runner = createRunner();
+let scheduler = null;
 
 function createWindow() {
   win = new BrowserWindow({
@@ -36,6 +41,33 @@ function createWindow() {
   });
 }
 
+function setTrayIcon(variant) {
+  if (!tray) return;
+  const file = variant === 'error' ? 'tray-icon-error.ico' : 'tray-icon.ico';
+  tray.setImage(nativeImage.createFromPath(join(ROOT, 'assets', file)));
+}
+
+function rebuildTrayMenu() {
+  if (!tray) return;
+  const paused = store.get('paused');
+  const menu = Menu.buildFromTemplate([
+    { label: 'Open Dashboard', click: () => win.show() },
+    { label: 'Claim Now', click: () => runClaim('tray') },
+    { type: 'separator' },
+    {
+      label: paused ? 'Resume schedule' : 'Pause schedule',
+      click: () => {
+        store.set('paused', !paused);
+        if (scheduler) scheduler.start();
+        rebuildTrayMenu();
+      },
+    },
+    { type: 'separator' },
+    { label: 'Exit', click: () => { app.isQuitting = true; app.quit(); } },
+  ]);
+  tray.setContextMenu(menu);
+}
+
 function createTray() {
   const icon = nativeImage.createFromPath(join(ROOT, 'assets', 'tray-icon.ico'));
   tray = new Tray(icon);
@@ -44,13 +76,7 @@ function createTray() {
     if (win.isVisible()) win.hide();
     else win.show();
   });
-  const menu = Menu.buildFromTemplate([
-    { label: 'Open Dashboard', click: () => win.show() },
-    { label: 'Claim Now', click: () => runClaim('tray') },
-    { type: 'separator' },
-    { label: 'Exit', click: () => { app.isQuitting = true; app.quit(); } },
-  ]);
-  tray.setContextMenu(menu);
+  rebuildTrayMenu();
 }
 
 function specFor(storeName, { show }) {
@@ -71,6 +97,10 @@ runner.on('run:line', e => broadcast('run:line', e));
 runner.on('run:end', e => {
   store.recordRun(e.store, e.classification);
   broadcast('run:end', e);
+  if (ERROR_CLASSES.has(e.classification.class)) {
+    notifyError(e.store, e.classification, () => win.show());
+    setTrayIcon('error');
+  }
 });
 
 async function runClaim(_reason) {
@@ -79,7 +109,11 @@ async function runClaim(_reason) {
   for (const s of ['epic', 'prime', 'gog']) {
     if (enabled[s]) specs[s] = specFor(s, { show: false });
   }
-  return runner.runAll(specs);
+  const results = await runner.runAll(specs);
+  notifyDailySummary(results, () => win.show());
+  const anyError = Object.values(results).some(r => ERROR_CLASSES.has(r.class));
+  setTrayIcon(anyError ? 'error' : 'normal');
+  return results;
 }
 
 ipcMain.handle('ping', () => 'pong');
@@ -132,9 +166,28 @@ ipcMain.handle('login', (_e, storeName) => {
   return runner.runOne(storeName, specFor(storeName, { show: true }));
 });
 
+ipcMain.handle('save-settings', (_e, settings) => {
+  if (settings.scheduleTime) store.set('scheduleTime', settings.scheduleTime);
+  if (typeof settings.autostartOnLogin === 'boolean') {
+    store.set('autostartOnLogin', settings.autostartOnLogin);
+    setAutostart(settings.autostartOnLogin);
+  }
+  if (settings.enabledStores) store.set('enabledStores', settings.enabledStores);
+  if (scheduler) scheduler.start();
+});
+
+ipcMain.handle('complete-first-run', () => {
+  store.set('firstRunCompleted', true);
+});
+
 app.whenReady().then(() => {
   createWindow();
   createTray();
+  setAutostart(store.get('autostartOnLogin'));
+  scheduler = createScheduler({ store, runClaim });
+  scheduler.start();
+  scheduler.runOnLaunchIfStale();
+  if (!store.get('firstRunCompleted')) win.show();
 });
 
 app.on('window-all-closed', e => e.preventDefault());

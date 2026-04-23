@@ -1,7 +1,12 @@
+import { showWelcome } from './welcome.js';
+
 async function init() {
   await window.api.ping();
-  await refresh();
-  await refreshHistory();
+  const showingWelcome = await showWelcome();
+  if (!showingWelcome) {
+    await refresh();
+    await refreshHistory();
+  }
 }
 
 async function refresh() {
