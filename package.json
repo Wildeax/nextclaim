@@ -8,7 +8,7 @@
     "start": "electron .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "electron-builder --win portable"
+    "build": "electron-builder --win"
   },
   "devDependencies": {
     "electron": "^32.0.0",

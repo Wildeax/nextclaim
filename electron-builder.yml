@@ -17,10 +17,9 @@ extraResources:
       - "**/*"
       - "!.git*"
       - "!data/**"
-  - from: "${env.LOCALAPPDATA}/ms-playwright/firefox-1482"
+  - from: "C:/Users/GAMER/AppData/Local/ms-playwright/firefox-1482"
     to: playwright-browsers/firefox-1482
 win:
-  target: portable
+  target: zip
   icon: assets/installer-icon.ico
-portable:
-  artifactName: AutoClaimer-${version}.exe
+  artifactName: AutoClaimer-${version}.zip

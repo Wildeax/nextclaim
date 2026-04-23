@@ -11,15 +11,10 @@ import { setAutostart } from './autostart.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 
-const PORTABLE_DATA_ROOT = process.env.PORTABLE_EXECUTABLE_DIR
-  ? join(process.env.PORTABLE_EXECUTABLE_DIR, 'data')
-  : join(ROOT, 'portable-data');
-const FGC_DIR = process.env.PORTABLE_EXECUTABLE_DIR
-  ? join(process.resourcesPath, 'free-games-claimer')
-  : join(ROOT, 'free-games-claimer');
-const FGC_DATA_DIR = process.env.PORTABLE_EXECUTABLE_DIR
-  ? join(PORTABLE_DATA_ROOT, 'fgc')
-  : join(FGC_DIR, 'data');
+const EXE_DIR = app.isPackaged ? dirname(process.execPath) : ROOT;
+const PORTABLE_DATA_ROOT = app.isPackaged ? join(EXE_DIR, 'data') : join(ROOT, 'portable-data');
+const FGC_DIR = app.isPackaged ? join(process.resourcesPath, 'free-games-claimer') : join(ROOT, 'free-games-claimer');
+const FGC_DATA_DIR = app.isPackaged ? join(PORTABLE_DATA_ROOT, 'fgc') : join(FGC_DIR, 'data');
 
 const SCRIPT_FOR = { epic: 'epic-games', prime: 'prime-gaming', gog: 'gog' };
 const ERROR_CLASSES = new Set(['login_expired', 'captcha', 'linking_needed', 'crash']);
@@ -88,7 +83,7 @@ function createTray() {
   rebuildTrayMenu();
 }
 
-const PLAYWRIGHT_BROWSERS_PATH = process.env.PORTABLE_EXECUTABLE_DIR
+const PLAYWRIGHT_BROWSERS_PATH = app.isPackaged
   ? join(process.resourcesPath, 'playwright-browsers')
   : undefined;
 
