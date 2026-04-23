@@ -17,8 +17,12 @@ export function createRunner() {
     const child = spawn(spec.cmd, spec.args, {
       env: { ...process.env, ...(spec.env ?? {}) },
       cwd: spec.cwd,
-      stdio: ['ignore', 'pipe', 'pipe'],
+      stdio: ['pipe', 'pipe', 'pipe'],
     });
+    try {
+      child.stdin.write('\n\n\n\n\n');
+      child.stdin.end();
+    } catch { /* child already exited */ }
 
     const events = [];
     let buf = '';
