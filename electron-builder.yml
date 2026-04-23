@@ -17,6 +17,8 @@ extraResources:
       - "**/*"
       - "!.git*"
       - "!data/**"
+  - from: "${env.LOCALAPPDATA}/ms-playwright/firefox-1482"
+    to: playwright-browsers/firefox-1482
 win:
   target: portable
   icon: assets/installer-icon.ico

@@ -88,17 +88,23 @@ function createTray() {
   rebuildTrayMenu();
 }
 
+const PLAYWRIGHT_BROWSERS_PATH = process.env.PORTABLE_EXECUTABLE_DIR
+  ? join(process.resourcesPath, 'playwright-browsers')
+  : undefined;
+
 function specFor(storeName, { show }) {
+  const env = {
+    ELECTRON_RUN_AS_NODE: '1',
+    SHOW: show ? '1' : '0',
+    BROWSER_DIR: join(FGC_DATA_DIR, 'browser'),
+    SCREENSHOTS_DIR: join(FGC_DATA_DIR, 'screenshots'),
+  };
+  if (PLAYWRIGHT_BROWSERS_PATH) env.PLAYWRIGHT_BROWSERS_PATH = PLAYWRIGHT_BROWSERS_PATH;
   return {
     cmd: process.execPath,
     args: [`${SCRIPT_FOR[storeName]}.js`],
     cwd: FGC_DIR,
-    env: {
-      ELECTRON_RUN_AS_NODE: '1',
-      SHOW: show ? '1' : '0',
-      BROWSER_DIR: join(FGC_DATA_DIR, 'browser'),
-      SCREENSHOTS_DIR: join(FGC_DATA_DIR, 'screenshots'),
-    },
+    env,
   };
 }
 
