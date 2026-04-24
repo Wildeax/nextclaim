@@ -19,6 +19,9 @@ extraResources:
       - "!data/**"
   - from: "C:/Users/GAMER/AppData/Local/ms-playwright/chromium-1169"
     to: playwright-browsers/chromium-1169
+extraFiles:
+  - from: DISTRIBUTE-README.txt
+    to: README.txt
 win:
   target: zip
   icon: assets/app-icon.ico

@@ -97,6 +97,7 @@ function specFor(storeName, { show }) {
   const env = {
     ELECTRON_RUN_AS_NODE: '1',
     SHOW: show ? '1' : '0',
+    FGC_DATA_DIR,
     BROWSER_DIR: join(FGC_DATA_DIR, 'browser'),
     SCREENSHOTS_DIR: join(FGC_DATA_DIR, 'screenshots'),
   };
