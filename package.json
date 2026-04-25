@@ -1,6 +1,6 @@
 {
   "name": "nextclaim",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "NextClaim — auto-claims daily free games on Epic, Prime Gaming, and GOG",
   "main": "ui/main.js",
   "type": "module",
