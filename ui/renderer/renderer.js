@@ -64,7 +64,7 @@ function renderHeader(status) {
   if (anyError) bits.push('<span class="dot red"></span>Needs attention');
   else bits.push('<span class="dot green"></span>Active');
   bits.push(`Next run: ${status.scheduleTime ?? '03:00'}`);
-  if (status.lastRunAt) bits.push(`Last run: ${formatRelative(status.lastRunAt)}`);
+  if (status.lastRunAt) bits.push(`Last run: <span data-ts="${status.lastRunAt}">${formatRelative(status.lastRunAt)}</span>`);
   sub.innerHTML = bits.join(' <span style="color:#4a5764">·</span> ');
 }
 
@@ -86,7 +86,7 @@ function renderStoreCards(status) {
       statusHtml = `<span class="dot ${dot}"></span>${label}${extra}`;
     }
     const meta = run
-      ? `<span>${formatRelative(run.at)}</span><button data-store="${s.id}" class="relogin">Re-login</button>`
+      ? `<span data-ts="${run.at}">${formatRelative(run.at)}</span><button data-store="${s.id}" class="relogin">Re-login</button>`
       : `<span>—</span><button data-store="${s.id}" class="relogin">Log in</button>`;
     return `
       <div class="store-card" data-store="${s.id}">
@@ -123,12 +123,12 @@ async function refreshHistory() {
   const html = rows.map(r => {
     const code = r.code ? `<button class="btn btn-ghost btn-sm" data-code="${r.code}">Copy code</button>` : '<span></span>';
     const store = STORES.find(s => s.id === r.store)?.name ?? r.store;
-    const when = formatRelative(new Date(r.time).getTime());
+    const ts = new Date(r.time).getTime();
     return `
       <div class="history-row">
         <span class="history-store">${store}</span>
-        <span class="history-title">${escapeHtml(r.title ?? '(untitled)')}</span>
-        <span class="history-time">${when}</span>
+        <span class="history-title" title="${escapeHtml(r.title ?? '')}">${escapeHtml(r.title ?? '(untitled)')}</span>
+        <span class="history-time" data-ts="${ts}">${formatRelative(ts)}</span>
         ${code}
       </div>`;
   }).join('');
@@ -151,6 +151,13 @@ function escapeHtml(s) {
 function clearLog() {
   document.getElementById('log-content').textContent = '';
 }
+
+setInterval(() => {
+  document.querySelectorAll('[data-ts]').forEach(el => {
+    const ts = Number(el.dataset.ts);
+    if (Number.isFinite(ts)) el.textContent = formatRelative(ts);
+  });
+}, 30_000);
 
 window.api.onRunLine(({ store, line }) => {
   const log = document.getElementById('log-content');

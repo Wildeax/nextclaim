@@ -196,7 +196,7 @@ button { font-family: inherit; }
   font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #8f98a0;
   font-weight: 600;
 }
-.history-title { color: #ffffff; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.history-title { color: #ffffff; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; user-select: text; cursor: text; }
 .history-time { color: #67707a; font-size: 11px; }
 .empty { padding: 24px; text-align: center; color: #67707a; font-size: 13px; }
 
