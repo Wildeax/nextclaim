@@ -93,7 +93,7 @@ const PLAYWRIGHT_BROWSERS_PATH = app.isPackaged
   ? join(process.resourcesPath, 'playwright-browsers')
   : undefined;
 
-function specFor(storeName, { show }) {
+function specFor(storeName, { show, loginOnly }) {
   const env = {
     ELECTRON_RUN_AS_NODE: '1',
     SHOW: show ? '1' : '0',
@@ -101,6 +101,7 @@ function specFor(storeName, { show }) {
     BROWSER_DIR: join(FGC_DATA_DIR, 'browser'),
     SCREENSHOTS_DIR: join(FGC_DATA_DIR, 'screenshots'),
   };
+  if (loginOnly) env.LOGIN_ONLY = '1';
   if (show) {
     // Cap viewport so the login form fits on common laptop displays (1366x768 / 1536x864).
     // Using 1366x720 keeps the Chromium window under 800px tall including chrome.
@@ -108,6 +109,14 @@ function specFor(storeName, { show }) {
     env.HEIGHT = '720';
     // Default 180s is too short when waiting for an email verification code.
     env.LOGIN_TIMEOUT = '600';
+    // Force on-screen position. Chromium's persistent context (shared user-data-dir
+    // across all stores) remembers the last window position in its Preferences file,
+    // so a previous scheduled run with --window-position=offscreen would otherwise
+    // make this re-login open off the visible desktop.
+    const primary = screen.getPrimaryDisplay();
+    const wa = primary.workArea;
+    env.WINDOW_POS_X = String(Math.max(wa.x, wa.x + Math.round((wa.width - 1366) / 2)));
+    env.WINDOW_POS_Y = String(Math.max(wa.y, wa.y + Math.round((wa.height - 720) / 2)));
   } else {
     // Non-interactive scheduled run: Epic still forces a visible Chromium (upstream dev branch
     // hardcodes headless:false because hCaptcha detects headless mode). Position off-screen +
@@ -195,14 +204,25 @@ ipcMain.handle('get-history', () => {
       // ignore malformed JSON files
     }
   }
-  rows.sort((a, b) => new Date(b.time) - new Date(a.time));
-  return rows.slice(0, 50);
+  // Same game may appear under multiple user keys when the script's user-resolution
+  // raced SPA hydration on an earlier run (e.g. fell back to literal 'user'/'null'
+  // before the real username was readable). Collapse those duplicates by store+id,
+  // keeping the most recent record.
+  const dedup = new Map();
+  for (const r of rows) {
+    const key = `${r.store}:${r.id}`;
+    const existing = dedup.get(key);
+    if (!existing || new Date(r.time) > new Date(existing.time)) dedup.set(key, r);
+  }
+  const out = Array.from(dedup.values());
+  out.sort((a, b) => new Date(b.time) - new Date(a.time));
+  return out.slice(0, 50);
 });
 
 ipcMain.handle('run-all', () => runClaim('manual'));
 
 ipcMain.handle('login', (_e, storeName) => {
-  return runner.runOne(storeName, specFor(storeName, { show: true }));
+  return runner.runOne(storeName, specFor(storeName, { show: true, loginOnly: true }));
 });
 
 ipcMain.handle('save-settings', (_e, settings) => {
