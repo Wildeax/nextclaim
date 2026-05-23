@@ -204,13 +204,12 @@ ipcMain.handle('get-history', () => {
       // ignore malformed JSON files
     }
   }
-  // Same game may appear under multiple user keys when the script's user-resolution
-  // raced SPA hydration on an earlier run (e.g. fell back to literal 'user'/'null'
-  // before the real username was readable). Collapse those duplicates by store+id,
-  // keeping the most recent record.
+  // Dedup by store+title (fallback to id). Same title appears under multiple ids when
+  // Epic mobile publishes separate Android/iOS slugs, and under multiple user keys when
+  // an earlier run's user-resolution raced SPA hydration. Keep the most recent record.
   const dedup = new Map();
   for (const r of rows) {
-    const key = `${r.store}:${r.id}`;
+    const key = `${r.store}:${r.title || r.id}`;
     const existing = dedup.get(key);
     if (!existing || new Date(r.time) > new Date(existing.time)) dedup.set(key, r);
   }
